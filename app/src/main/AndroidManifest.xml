@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bhtiktok">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:label="BHTikTok Android"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:allowBackup="true">
+
+        <!-- Xposed Module Meta-Data -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="BHTikTok++ port for Android — Downloads, No Watermark, Region Spoof, No Ads, Fake Stats, Confirm Actions, AutoPlay, Progress Bar, Anonymous Seen, UI Hider" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="93" />
+        <meta-data
+            android:name="xposedscope"
+            android:value="com.zhiliaoapp.musically,com.ss.android.ugc.aweme" />
+
+        <!-- Settings Activity -->
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="true"
+            android:label="BHTikTok Settings">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>

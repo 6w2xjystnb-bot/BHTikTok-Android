@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Media Download">
+        <SwitchPreferenceCompat
+            android:key="feature_download_button"
+            android:title="Download Button"
+            android:summary="Add a download button on each video"
+            android:defaultValue="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Watermark &amp; Region">
+        <SwitchPreferenceCompat
+            android:key="feature_remove_watermark"
+            android:title="Remove Watermark"
+            android:summary="Strip TikTok watermark from video URLs"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_upload_region"
+            android:title="Spoof Region"
+            android:summary="Override TikTok region/country"
+            android:defaultValue="false" />
+
+        <ListPreference
+            android:key="feature_selected_region"
+            android:title="Selected Region"
+            android:summary="US"
+            android:defaultValue="US"
+            android:entries="@array/regions"
+            android:entryValues="@array/regions"
+            android:dependency="feature_upload_region" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Ads &amp; UI">
+        <SwitchPreferenceCompat
+            android:key="feature_hide_ads"
+            android:title="Hide Ads"
+            android:summary="Remove sponsored content from feed"
+            android:defaultValue="true" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_hide_emoji"
+            android:title="Hide Emoji Bar"
+            android:summary="Hide emoji bar in comments"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_hide_top_items"
+            android:title="Hide Top Items"
+            android:summary="Hide top overlay in feed"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_progress_bar"
+            android:title="Always Show Progress Bar"
+            android:summary="Force video progress bar visible"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_auto_play"
+            android:title="Auto Play Next"
+            android:summary="Automatically play next video when current ends"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_disable_live"
+            android:title="Disable Live"
+            android:summary="Hide live streams from feed"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_disable_sensitive"
+            android:title="Disable Sensitive Warnings"
+            android:summary="Skip sensitive content warnings"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Fake Changes (Local Only)">
+        <SwitchPreferenceCompat
+            android:key="feature_fake_verified"
+            android:title="Fake Verified Badge"
+            android:summary="Show verified badge on all profiles"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_fake_follower_count"
+            android:title="Fake Follower Count"
+            android:summary="Set followers to 999,999"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_fake_following_count"
+            android:title="Fake Following Count"
+            android:summary="Set following to 999,999"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_fake_like_count"
+            android:title="Fake Like Count"
+            android:summary="Set likes to 999,999"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Confirmations">
+        <SwitchPreferenceCompat
+            android:key="feature_confirm_like"
+            android:title="Confirm Like"
+            android:summary="Show dialog before liking"
+            android:defaultValue="false" />
+
+        <SwitchPreferenceCompat
+            android:key="feature_confirm_follow"
+            android:title="Confirm Follow"
+            android:summary="Show dialog before following"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Privacy">
+        <SwitchPreferenceCompat
+            android:key="feature_anonymous_seen"
+            android:title="Anonymous Seen"
+            android:summary="Do not mark DMs as read"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

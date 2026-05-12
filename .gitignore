@@ -1,0 +1,25 @@
+# Build outputs
+build/
+app/build/
+.gradle/
+local.properties
+
+# IDEs
+.idea/
+*.iml
+
+# Large tooling
+/tools/
+/gradle/
+/gradle.zip
+*.jar
+!app/libs/*.jar
+
+# APKs
+*.apk
+*.xapk
+/output/
+
+# OS
+.DS_Store
+Thumbs.db

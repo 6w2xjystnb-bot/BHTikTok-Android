@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="regions">
+        <item>US</item>
+        <item>GB</item>
+        <item>JP</item>
+        <item>KR</item>
+        <item>RU</item>
+        <item>DE</item>
+        <item>FR</item>
+        <item>BR</item>
+        <item>IN</item>
+        <item>ID</item>
+        <item>TR</item>
+        <item>MX</item>
+        <item>ES</item>
+        <item>IT</item>
+        <item>TH</item>
+        <item>VN</item>
+        <item>PH</item>
+        <item>MY</item>
+        <item>TW</item>
+        <item>HK</item>
+        <item>SG</item>
+        <item>AU</item>
+        <item>CA</item>
+        <item>NL</item>
+        <item>PL</item>
+        <item>UA</item>
+        <item>KZ</item>
+        <item>UZ</item>
+        <item>BY</item>
+        <item>AR</item>
+        <item>CL</item>
+        <item>CO</item>
+        <item>PE</item>
+        <item>EG</item>
+        <item>SA</item>
+        <item>AE</item>
+        <item>ZA</item>
+        <item>NG</item>
+        <item>PK</item>
+        <item>BD</item>
+    </string-array>
+</resources>
