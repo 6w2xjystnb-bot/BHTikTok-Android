@@ -8,54 +8,25 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class AnonymousSeenHook {
 
-    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static void hookSeen(XC_LoadPackage.LoadPackageParam lpparam, Class<?> chatClass) {
         if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_ANONYMOUS_SEEN)) return;
-
-        // Hook markMessageAsRead in chat controller
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.im.sdk.chat.controller.ChatRoomController",
-                lpparam.classLoader,
-                "markMessageAsRead",
-                String.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.setResult(null);
-                    }
+            XposedHelpers.findAndHookMethod(chatClass, "markMessageAsRead", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(null);
                 }
-            );
+            });
         } catch (Throwable t) { }
+    }
 
-        // Alternative: hook MessageReadManager
+    public static void hookTyping(XC_LoadPackage.LoadPackageParam lpparam, Class<?> imClass) {
+        if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_ANONYMOUS_SEEN)) return;
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.im.sdk.chat.data.manager.MessageReadManager",
-                lpparam.classLoader,
-                "sendReadReceipt",
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.setResult(null);
-                    }
+            XposedHelpers.findAndHookMethod(imClass, "sendTypingStatus", new XC_MethodHook() {
+                @Override protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(null);
                 }
-            );
-        } catch (Throwable t) { }
-
-        // Alternative: hook setMessageReadStatus
-        try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.im.sdk.chat.data.manager.MessageReadManager",
-                lpparam.classLoader,
-                "setMessageReadStatus",
-                String.class, boolean.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.setResult(null);
-                    }
-                }
-            );
+            });
         } catch (Throwable t) { }
     }
 }

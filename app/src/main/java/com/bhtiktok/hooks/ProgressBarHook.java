@@ -10,55 +10,21 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class ProgressBarHook {
 
-    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static void hookProgress(XC_LoadPackage.LoadPackageParam lpparam, Class<?> progressClass) {
         if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_PROGRESS_BAR)) return;
-
-        // Hook video player progress to force show progress bar
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.player.VideoPlayerView",
-                lpparam.classLoader,
-                "onProgressChanged",
-                int.class, int.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        try {
-                            Object progressBar = XposedHelpers.getObjectField(param.thisObject, "progressBar");
-                            if (progressBar instanceof View) {
-                                ((View) progressBar).setVisibility(View.VISIBLE);
-                            }
-                        } catch (Throwable t) { }
-                        try {
-                            Object seekBar = XposedHelpers.getObjectField(param.thisObject, "seekBar");
-                            if (seekBar instanceof View) {
-                                ((View) seekBar).setVisibility(View.VISIBLE);
-                            }
-                        } catch (Throwable t) { }
-                    }
+            XposedHelpers.findAndHookMethod(progressClass, "onProgressChanged", int.class, int.class, new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    try {
+                        Object pb = XposedHelpers.getObjectField(param.thisObject, "progressBar");
+                        if (pb instanceof View) ((View) pb).setVisibility(View.VISIBLE);
+                    } catch (Throwable t) { }
+                    try {
+                        Object sb = XposedHelpers.getObjectField(param.thisObject, "seekBar");
+                        if (sb instanceof View) ((View) sb).setVisibility(View.VISIBLE);
+                    } catch (Throwable t) { }
                 }
-            );
-        } catch (Throwable t) { }
-
-        // Alternative: hook AwemeVideoPlayerController.onProgressUpdate
-        try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.AwemeVideoPlayerController",
-                lpparam.classLoader,
-                "onProgressUpdate",
-                long.class, long.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        try {
-                            Object progressView = XposedHelpers.getObjectField(param.thisObject, "mProgressBar");
-                            if (progressView instanceof View) {
-                                ((View) progressView).setVisibility(View.VISIBLE);
-                            }
-                        } catch (Throwable t) { }
-                    }
-                }
-            );
+            });
         } catch (Throwable t) { }
     }
 }

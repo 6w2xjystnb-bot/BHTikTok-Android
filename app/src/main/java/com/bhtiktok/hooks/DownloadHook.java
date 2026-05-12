@@ -21,77 +21,78 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class DownloadHook {
 
-    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static void hookViewHolder(XC_LoadPackage.LoadPackageParam lpparam, Class<?> viewHolderClass) {
         if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_DOWNLOAD_BUTTON)) return;
-
-        // Hook VideoViewHolder.bind(Aweme) to inject download button
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.adapter.VideoViewHolder",
-                lpparam.classLoader,
-                "bind",
-                "com.ss.android.ugc.aweme.feed.model.Aweme",
+            XposedHelpers.findAndHookMethod(viewHolderClass, "h1",
+                XposedHelpers.findClass("com.ss.android.ugc.aweme.feed.model.Aweme", lpparam.classLoader),
                 new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        Object aweme = param.args[0];
-                        if (aweme == null) return;
-
-                        View itemView = (View) XposedHelpers.getObjectField(param.thisObject, "itemView");
-                        if (itemView == null) return;
-
-                        Context ctx = itemView.getContext();
-                        ViewGroup container = findContainer(itemView);
-                        if (container == null) return;
-
-                        // Avoid duplicate buttons
-                        String tag = "bhtiktok_download_btn";
-                        if (container.findViewWithTag(tag) != null) return;
-
-                        Button downloadBtn = new Button(ctx);
-                        downloadBtn.setTag(tag);
-                        downloadBtn.setText("\u2B07");
-                        downloadBtn.setTextSize(12f);
-                        downloadBtn.setBackgroundColor(Color.parseColor("#FE2C55"));
-                        downloadBtn.setTextColor(Color.WHITE);
-
-                        // Use appropriate LayoutParams based on container type
-                        ViewGroup.LayoutParams lp;
-                        if (container instanceof FrameLayout) {
-                            FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(
-                                FrameLayout.LayoutParams.WRAP_CONTENT,
-                                FrameLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            flp.gravity = Gravity.TOP | Gravity.END;
-                            flp.setMargins(0, 20, 20, 0);
-                            lp = flp;
-                        } else {
-                            lp = new ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.WRAP_CONTENT,
-                                ViewGroup.LayoutParams.WRAP_CONTENT
-                            );
-                        }
-
-                        downloadBtn.setOnClickListener(v -> {
-                            try {
-                                handleDownload(ctx, aweme);
-                            } catch (Exception ex) {
-                                Toast.makeText(ctx, "Download error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        container.addView(downloadBtn, lp);
+                        injectButton(param);
                     }
                 }
             );
+        } catch (Throwable t) {
+            // fallback: try "bind"
+            try {
+                XposedHelpers.findAndHookMethod(viewHolderClass, "bind",
+                    XposedHelpers.findClass("com.ss.android.ugc.aweme.feed.model.Aweme", lpparam.classLoader),
+                    new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            injectButton(param);
+                        }
+                    }
+                );
+            } catch (Throwable t2) { }
+        }
+    }
+
+    private static void injectButton(XC_MethodHook.MethodHookParam param) {
+        try {
+            Object aweme = param.args[0];
+            if (aweme == null) return;
+            View itemView = (View) XposedHelpers.getObjectField(param.thisObject, "itemView");
+            if (itemView == null) return;
+            Context ctx = itemView.getContext();
+            ViewGroup container = findContainer(itemView);
+            if (container == null) return;
+            String tag = "bhtiktok_download_btn";
+            if (container.findViewWithTag(tag) != null) return;
+
+            Button btn = new Button(ctx);
+            btn.setTag(tag);
+            btn.setText("\u2B07");
+            btn.setTextSize(12f);
+            btn.setBackgroundColor(Color.parseColor("#FE2C55"));
+            btn.setTextColor(Color.WHITE);
+
+            ViewGroup.LayoutParams lp;
+            if (container instanceof FrameLayout) {
+                FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+                flp.gravity = Gravity.TOP | Gravity.END;
+                flp.setMargins(0, 20, 20, 0);
+                lp = flp;
+            } else {
+                lp = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+
+            btn.setOnClickListener(v -> {
+                try { handleDownload(ctx, aweme); }
+                catch (Exception ex) { Toast.makeText(ctx, "Error: "+ex.getMessage(), Toast.LENGTH_SHORT).show(); }
+            });
+            container.addView(btn, lp);
         } catch (Throwable t) { }
     }
 
-    private ViewGroup findContainer(View root) {
+    private static ViewGroup findContainer(View root) {
         if (root instanceof FrameLayout) return (FrameLayout) root;
         if (root instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) root;
-            for (int i = 0; i < vg.getChildCount(); i++) {
+            for (int i=0; i<vg.getChildCount(); i++) {
                 View child = vg.getChildAt(i);
                 if (child instanceof FrameLayout) return (FrameLayout) child;
                 if (child instanceof ViewGroup) return (ViewGroup) child;
@@ -101,8 +102,7 @@ public class DownloadHook {
         return null;
     }
 
-    private void handleDownload(Context ctx, Object aweme) throws Exception {
-        // Get video
+    private static void handleDownload(android.content.Context ctx, Object aweme) throws Exception {
         Object video = XposedHelpers.callMethod(aweme, "getVideo");
         if (video != null) {
             Object playAddr = XposedHelpers.callMethod(video, "getPlayAddr");
@@ -116,9 +116,7 @@ public class DownloadHook {
                 }
             }
         }
-
-        // Try music
-        Object music = (Object) XposedHelpers.callMethod(aweme, "getMusic");
+        Object music = XposedHelpers.callMethod(aweme, "getMusic");
         if (music != null) {
             Object playUrl = XposedHelpers.callMethod(music, "getPlayUrl");
             if (playUrl != null) {
@@ -130,7 +128,6 @@ public class DownloadHook {
                 }
             }
         }
-
-        Toast.makeText(ctx, "No downloadable URL found", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ctx, "No URL found", Toast.LENGTH_SHORT).show();
     }
 }

@@ -8,47 +8,32 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class AutoPlayHook {
 
-    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static void hookPlayer(XC_LoadPackage.LoadPackageParam lpparam, Class<?> playerClass) {
         if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_AUTO_PLAY)) return;
-
-        // Hook on video completion to auto-skip to next
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.AwemeVideoPlayerController",
-                lpparam.classLoader,
-                "onCompletion",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        try {
-                            Object feedFragment = XposedHelpers.getObjectField(param.thisObject, "mFeedFragment");
-                            if (feedFragment != null) {
-                                XposedHelpers.callMethod(feedFragment, "moveToNext");
-                                return;
-                            }
-                        } catch (Throwable t) { }
-
-                        // fallback: try scroll or trigger swipe
-                        try {
-                            Object recyclerView = XposedHelpers.getObjectField(param.thisObject, "mRecyclerView");
-                            if (recyclerView != null) {
-                                int current = (int) XposedHelpers.callMethod(recyclerView, "getCurrentPosition");
-                                XposedHelpers.callMethod(recyclerView, "scrollToPosition", current + 1);
-                                return;
-                            }
-                        } catch (Throwable t) { }
-
-                        // fallback 2: try ViewPager
-                        try {
-                            Object viewPager = XposedHelpers.getObjectField(param.thisObject, "mViewPager");
-                            if (viewPager != null) {
-                                int current = (int) XposedHelpers.callMethod(viewPager, "getCurrentItem");
-                                XposedHelpers.callMethod(viewPager, "setCurrentItem", current + 1);
-                            }
-                        } catch (Throwable t) { }
-                    }
+            XposedHelpers.findAndHookMethod(playerClass, "onCompletion", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    try {
+                        Object feed = XposedHelpers.getObjectField(param.thisObject, "mFeedFragment");
+                        if (feed != null) { XposedHelpers.callMethod(feed, "moveToNext"); return; }
+                    } catch (Throwable t) { }
+                    try {
+                        Object rv = XposedHelpers.getObjectField(param.thisObject, "mRecyclerView");
+                        if (rv != null) {
+                            int cur = (int) XposedHelpers.callMethod(rv, "getCurrentPosition");
+                            XposedHelpers.callMethod(rv, "scrollToPosition", cur + 1);
+                            return;
+                        }
+                    } catch (Throwable t) { }
+                    try {
+                        Object vp = XposedHelpers.getObjectField(param.thisObject, "mViewPager");
+                        if (vp != null) {
+                            int cur = (int) XposedHelpers.callMethod(vp, "getCurrentItem");
+                            XposedHelpers.callMethod(vp, "setCurrentItem", cur + 1);
+                        }
+                    } catch (Throwable t) { }
                 }
-            );
+            });
         } catch (Throwable t) { }
     }
 }

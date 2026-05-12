@@ -1,7 +1,6 @@
 package com.bhtiktok.hooks;
 
 import com.bhtiktok.utils.PrefsHelper;
-import com.bhtiktok.utils.VideoUrlExtractor;
 
 import java.util.List;
 
@@ -11,83 +10,31 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class WatermarkHook {
 
-    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static void hookVideo(XC_LoadPackage.LoadPackageParam lpparam, Class<?> videoClass) {
         if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_REMOVE_WATERMARK)) return;
-
-        // Hook 1: Video.getPlayAddr() → modify URLs on-the-fly
         try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.model.Video",
-                lpparam.classLoader,
-                "getPlayAddr",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        Object urlModel = param.getResult();
-                        if (urlModel == null) return;
-
-                        List<String> urls = (List<String>) XposedHelpers.callMethod(urlModel, "getUrlList");
-                        if (urls == null || urls.isEmpty()) return;
-
-                        List<String> noWm = VideoUrlExtractor.getNoWatermarkUrls(urls);
-                        XposedHelpers.callMethod(urlModel, "setUrlList", noWm);
+            XposedHelpers.findAndHookMethod(videoClass, "getDownloadNoWatermarkAddr", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Object noWater = param.getResult();
+                    if (noWater != null) return;
+                    try {
+                        Object playAddr = XposedHelpers.callMethod(param.thisObject, "getPlayAddr");
+                        if (playAddr == null) return;
+                        List<String> urlList = (List<String>) XposedHelpers.callMethod(playAddr, "getUrlList");
+                        if (urlList == null || urlList.isEmpty()) return;
+                        String url = urlList.get(0).replace("playwm", "play").replaceAll("\\?.*", "");
+                        // recreate UrlModel without watermark params
+                        Object urlModel = XposedHelpers.newInstance(
+                            XposedHelpers.findClass("com.ss.android.ugc.aweme.base.model.UrlModel", lpparam.classLoader));
+                        XposedHelpers.callMethod(urlModel, "setUrlList", java.util.Collections.singletonList(url));
                         param.setResult(urlModel);
-                    }
+                    } catch (Throwable t) { }
                 }
-            );
+            });
         } catch (Throwable t) { }
+    }
 
-        // Hook 2: Video.getDownloadAddr() → also clean
-        try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.model.Video",
-                lpparam.classLoader,
-                "getDownloadAddr",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        Object urlModel = param.getResult();
-                        if (urlModel == null) return;
-
-                        List<String> urls = (List<String>) XposedHelpers.callMethod(urlModel, "getUrlList");
-                        if (urls == null || urls.isEmpty()) return;
-
-                        List<String> noWm = VideoUrlExtractor.getNoWatermarkUrls(urls);
-                        XposedHelpers.callMethod(urlModel, "setUrlList", noWm);
-                        param.setResult(urlModel);
-                    }
-                }
-            );
-        } catch (Throwable t) { }
-
-        // Hook 3: Watermark builder (if exists)
-        try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.watermark.WaterMarkBuilder",
-                lpparam.classLoader,
-                "build",
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.setResult(null);
-                    }
-                }
-            );
-        } catch (Throwable t) { }
-
-        // Hook 4: Aweme.getWatermarkInfo → null
-        try {
-            XposedHelpers.findAndHookMethod(
-                "com.ss.android.ugc.aweme.feed.model.Aweme",
-                lpparam.classLoader,
-                "getWatermarkInfo",
-                new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        param.setResult(null);
-                    }
-                }
-            );
-        } catch (Throwable t) { }
+    public void init(XC_LoadPackage.LoadPackageParam lpparam) {
+        // legacy fallback
     }
 }

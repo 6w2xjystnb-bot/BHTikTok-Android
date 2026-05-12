@@ -3,107 +3,53 @@ package com.bhtiktok.hooks;
 import com.bhtiktok.utils.PrefsHelper;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class FakeChangesHook {
 
+    public static void hookVerified(XC_LoadPackage.LoadPackageParam lpparam, Class<?> userClass) {
+        if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_VERIFIED)) return;
+        try {
+            XposedHelpers.findAndHookMethod(userClass, "getIsVerifiedTako", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(1);
+                }
+            });
+        } catch (Throwable t) { }
+        try {
+            XposedHelpers.findAndHookMethod(userClass, "isEmailVerified", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(true);
+                }
+            });
+        } catch (Throwable t) { }
+        try {
+            XposedHelpers.findAndHookMethod(userClass, "isVerified", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(true);
+                }
+            });
+        } catch (Throwable t) { }
+    }
+
+    public static void hookFollowers(XC_LoadPackage.LoadPackageParam lpparam, Class<?> userClass) {
+        if (!PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_FOLLOWER_COUNT)) return;
+        try {
+            XposedHelpers.findAndHookMethod(userClass, "getFollowerCount", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(999999);
+                }
+            });
+            XposedHelpers.findAndHookMethod(userClass, "getFollowingCount", new XC_MethodHook() {
+                @Override protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(999);
+                }
+            });
+        } catch (Throwable t) { }
+    }
+
     public void init(XC_LoadPackage.LoadPackageParam lpparam) {
-        boolean fakeVerified = PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_VERIFIED);
-        boolean fakeFollowers = PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_FOLLOWER_COUNT);
-        boolean fakeFollowing = PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_FOLLOWING_COUNT);
-        boolean fakeLikes = PrefsHelper.isEnabled(PrefsHelper.FEATURE_FAKE_LIKE_COUNT);
-
-        if (!fakeVerified && !fakeFollowers && !fakeFollowing && !fakeLikes) return;
-
-        // User.isVerified() → true
-        if (fakeVerified) {
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.profile.model.User",
-                    lpparam.classLoader,
-                    "isVerified",
-                    XC_MethodReplacement.returnConstant(true)
-                );
-            } catch (Throwable t) { }
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.profile.model.User",
-                    lpparam.classLoader,
-                    "getVerificationType",
-                    new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            param.setResult(1); // verified type
-                        }
-                    }
-                );
-            } catch (Throwable t) { }
-        }
-
-        // User.getFollowerCount() → 999999
-        if (fakeFollowers) {
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.profile.model.User",
-                    lpparam.classLoader,
-                    "getFollowerCount",
-                    new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            param.setResult(999999L);
-                        }
-                    }
-                );
-            } catch (Throwable t) { }
-        }
-
-        // User.getFollowingCount() → 999999
-        if (fakeFollowing) {
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.profile.model.User",
-                    lpparam.classLoader,
-                    "getFollowingCount",
-                    new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            param.setResult(999999L);
-                        }
-                    }
-                );
-            } catch (Throwable t) { }
-        }
-
-        // AwemeStatistics.getDiggCount() / getShareCount() etc
-        if (fakeLikes) {
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.feed.model.AwemeStatistics",
-                    lpparam.classLoader,
-                    "getDiggCount",
-                    new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            param.setResult(999999L);
-                        }
-                    }
-                );
-            } catch (Throwable t) { }
-            try {
-                XposedHelpers.findAndHookMethod(
-                    "com.ss.android.ugc.aweme.feed.model.AwemeStatistics",
-                    lpparam.classLoader,
-                    "getShareCount",
-                    new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            param.setResult(999999L);
-                        }
-                    }
-                );
-            } catch (Throwable t) { }
-        }
+        // legacy fallback
     }
 }
