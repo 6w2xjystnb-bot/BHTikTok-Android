@@ -26,7 +26,7 @@ public class FakeChangesHook {
                     "isVerified",
                     XC_MethodReplacement.returnConstant(true)
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
             try {
                 XposedHelpers.findAndHookMethod(
                     "com.ss.android.ugc.aweme.profile.model.User",
@@ -39,7 +39,7 @@ public class FakeChangesHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // User.getFollowerCount() → 999999
@@ -56,7 +56,7 @@ public class FakeChangesHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // User.getFollowingCount() → 999999
@@ -73,7 +73,7 @@ public class FakeChangesHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // AwemeStatistics.getDiggCount() / getShareCount() etc
@@ -90,7 +90,7 @@ public class FakeChangesHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
             try {
                 XposedHelpers.findAndHookMethod(
                     "com.ss.android.ugc.aweme.feed.model.AwemeStatistics",
@@ -103,7 +103,7 @@ public class FakeChangesHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
     }
 }

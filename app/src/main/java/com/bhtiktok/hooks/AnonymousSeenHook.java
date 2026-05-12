@@ -25,7 +25,7 @@ public class AnonymousSeenHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Alternative: hook MessageReadManager
         try {
@@ -40,7 +40,7 @@ public class AnonymousSeenHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Alternative: hook setMessageReadStatus
         try {
@@ -56,6 +56,6 @@ public class AnonymousSeenHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

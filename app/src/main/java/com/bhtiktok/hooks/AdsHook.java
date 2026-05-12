@@ -20,7 +20,7 @@ public class AdsHook {
                 "isAd",
                 XC_MethodReplacement.returnConstant(false)
             );
-        } catch (Exception e) { /* class not found or obfuscated */ }
+        } catch (Throwable t) { /* class not found or obfuscated */ }
 
         // Hook 2: Aweme.isAds() variant
         try {
@@ -30,7 +30,7 @@ public class AdsHook {
                 "isAds",
                 XC_MethodReplacement.returnConstant(false)
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 3: FeedCellViewHolder — skip bind for ads (fallback if isAd not used)
         try {
@@ -53,6 +53,6 @@ public class AdsHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

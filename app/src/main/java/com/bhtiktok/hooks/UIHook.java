@@ -33,11 +33,11 @@ public class UIHook {
                                 if (emojiView instanceof View) {
                                     ((View) emojiView).setVisibility(View.GONE);
                                 }
-                            } catch (Exception e) { }
+                            } catch (Throwable t) { }
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // Hide top items (status bar overlay in feed)
@@ -55,11 +55,11 @@ public class UIHook {
                                 if (topView instanceof View) {
                                     ((View) topView).setVisibility(View.GONE);
                                 }
-                            } catch (Exception e) { }
+                            } catch (Throwable t) { }
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // Disable Live
@@ -77,7 +77,7 @@ public class UIHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // Disable sensitive content warnings
@@ -94,7 +94,7 @@ public class UIHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
             try {
                 XposedHelpers.findAndHookMethod(
                     "com.ss.android.ugc.aweme.feed.model.Aweme",
@@ -107,7 +107,7 @@ public class UIHook {
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
     }
 }

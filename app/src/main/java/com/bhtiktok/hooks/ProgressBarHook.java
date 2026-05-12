@@ -28,17 +28,17 @@ public class ProgressBarHook {
                             if (progressBar instanceof View) {
                                 ((View) progressBar).setVisibility(View.VISIBLE);
                             }
-                        } catch (Exception e) { }
+                        } catch (Throwable t) { }
                         try {
                             Object seekBar = XposedHelpers.getObjectField(param.thisObject, "seekBar");
                             if (seekBar instanceof View) {
                                 ((View) seekBar).setVisibility(View.VISIBLE);
                             }
-                        } catch (Exception e) { }
+                        } catch (Throwable t) { }
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Alternative: hook AwemeVideoPlayerController.onProgressUpdate
         try {
@@ -55,10 +55,10 @@ public class ProgressBarHook {
                             if (progressView instanceof View) {
                                 ((View) progressView).setVisibility(View.VISIBLE);
                             }
-                        } catch (Exception e) { }
+                        } catch (Throwable t) { }
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

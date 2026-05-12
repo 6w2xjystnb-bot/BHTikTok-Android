@@ -24,20 +24,31 @@ public class AutoPlayHook {
                             Object feedFragment = XposedHelpers.getObjectField(param.thisObject, "mFeedFragment");
                             if (feedFragment != null) {
                                 XposedHelpers.callMethod(feedFragment, "moveToNext");
+                                return;
                             }
-                        } catch (Exception e) {
-                            // fallback: try scroll or trigger swipe
-                            try {
-                                Object recyclerView = XposedHelpers.getObjectField(param.thisObject, "mRecyclerView");
-                                if (recyclerView != null) {
-                                    XposedHelpers.callMethod(recyclerView, "scrollToPosition",
-                                        (int) XposedHelpers.callMethod(recyclerView, "getCurrentPosition") + 1);
-                                }
-                            } catch (Exception e2) { }
-                        }
+                        } catch (Throwable t) { }
+
+                        // fallback: try scroll or trigger swipe
+                        try {
+                            Object recyclerView = XposedHelpers.getObjectField(param.thisObject, "mRecyclerView");
+                            if (recyclerView != null) {
+                                int current = (int) XposedHelpers.callMethod(recyclerView, "getCurrentPosition");
+                                XposedHelpers.callMethod(recyclerView, "scrollToPosition", current + 1);
+                                return;
+                            }
+                        } catch (Throwable t) { }
+
+                        // fallback 2: try ViewPager
+                        try {
+                            Object viewPager = XposedHelpers.getObjectField(param.thisObject, "mViewPager");
+                            if (viewPager != null) {
+                                int current = (int) XposedHelpers.callMethod(viewPager, "getCurrentItem");
+                                XposedHelpers.callMethod(viewPager, "setCurrentItem", current + 1);
+                            }
+                        } catch (Throwable t) { }
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

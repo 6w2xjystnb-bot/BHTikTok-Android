@@ -26,7 +26,7 @@ public class RegionHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 2: RegionService
         try {
@@ -41,7 +41,7 @@ public class RegionHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 3: StoreRegionModel / RegionModel
         try {
@@ -56,29 +56,36 @@ public class RegionHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
-        // Hook 4: Country / Locale
+        // Hook 4: CommonHttpRequest / device registration region
         try {
             XposedHelpers.findAndHookMethod(
-                "java.util.Locale",
+                "com.ss.android.ugc.aweme.app.host.HostProvider",
                 lpparam.classLoader,
-                "getCountry",
+                "getStoreRegion",
                 new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        // Only override if called from TikTok package
-                        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-                        for (StackTraceElement el : stack) {
-                            if (el.getClassName().startsWith("com.ss.android.ugc.aweme") ||
-                                el.getClassName().startsWith("com.zhiliaoapp")) {
-                                param.setResult(selectedRegion);
-                                return;
-                            }
-                        }
+                        param.setResult(selectedRegion);
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
+
+        // Hook 5: Anti-addiction / sim region
+        try {
+            XposedHelpers.findAndHookMethod(
+                "com.ss.android.ugc.aweme.setting.country.CountryChangeActivity",
+                lpparam.classLoader,
+                "getCurrentRegion",
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        param.setResult(selectedRegion);
+                    }
+                }
+            );
+        } catch (Throwable t) { }
     }
 }

@@ -35,7 +35,7 @@ public class WatermarkHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 2: Video.getDownloadAddr() → also clean
         try {
@@ -58,7 +58,7 @@ public class WatermarkHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 3: Watermark builder (if exists)
         try {
@@ -73,7 +73,7 @@ public class WatermarkHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
 
         // Hook 4: Aweme.getWatermarkInfo → null
         try {
@@ -88,6 +88,6 @@ public class WatermarkHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

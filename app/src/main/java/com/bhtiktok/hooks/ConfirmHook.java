@@ -33,13 +33,13 @@ public class ConfirmHook {
                             showConfirmDialog(ctx, "Like this video?", () -> {
                                 try {
                                     XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args);
-                                } catch (Exception e) { }
+                                } catch (Throwable t) { }
                             });
                             param.setResult(null);
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
 
         // Confirm Follow
@@ -57,13 +57,13 @@ public class ConfirmHook {
                             showConfirmDialog(ctx, "Follow this user?", () -> {
                                 try {
                                     XposedBridge.invokeOriginalMethod(param.method, param.thisObject, param.args);
-                                } catch (Exception e) { }
+                                } catch (Throwable t) { }
                             });
                             param.setResult(null);
                         }
                     }
                 );
-            } catch (Exception e) { }
+            } catch (Throwable t) { }
         }
     }
 
@@ -75,6 +75,6 @@ public class ConfirmHook {
                 .setPositiveButton("Yes", (dialog, which) -> onConfirm.run())
                 .setNegativeButton("No", null)
                 .show();
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 }

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bhtiktok.utils.BHDownloadManager;
@@ -51,18 +50,27 @@ public class DownloadHook {
 
                         Button downloadBtn = new Button(ctx);
                         downloadBtn.setTag(tag);
-                        downloadBtn.setText("⬇");
+                        downloadBtn.setText("\u2B07");
                         downloadBtn.setTextSize(12f);
                         downloadBtn.setBackgroundColor(Color.parseColor("#FE2C55"));
                         downloadBtn.setTextColor(Color.WHITE);
 
-                        // Position: top-right corner
-                        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                            FrameLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        lp.gravity = Gravity.TOP | Gravity.END;
-                        lp.setMargins(0, 20, 20, 0);
+                        // Use appropriate LayoutParams based on container type
+                        ViewGroup.LayoutParams lp;
+                        if (container instanceof FrameLayout) {
+                            FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            flp.gravity = Gravity.TOP | Gravity.END;
+                            flp.setMargins(0, 20, 20, 0);
+                            lp = flp;
+                        } else {
+                            lp = new ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                            );
+                        }
 
                         downloadBtn.setOnClickListener(v -> {
                             try {
@@ -76,7 +84,7 @@ public class DownloadHook {
                     }
                 }
             );
-        } catch (Exception e) { }
+        } catch (Throwable t) { }
     }
 
     private ViewGroup findContainer(View root) {
@@ -86,9 +94,11 @@ public class DownloadHook {
             for (int i = 0; i < vg.getChildCount(); i++) {
                 View child = vg.getChildAt(i);
                 if (child instanceof FrameLayout) return (FrameLayout) child;
+                if (child instanceof ViewGroup) return (ViewGroup) child;
             }
+            return vg;
         }
-        return root instanceof ViewGroup ? (ViewGroup) root : null;
+        return null;
     }
 
     private void handleDownload(Context ctx, Object aweme) throws Exception {
